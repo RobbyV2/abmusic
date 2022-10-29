@@ -5,7 +5,7 @@ Music cog for discord bots. Supports YouTube, YoutubeMusic, SoundCloud and Spoti
 # Installation
 
 ```sh
-pip install git+https://github.com/RobbyV2/abmusic
+pip install git+https://github.com/RobbyV2/abmusic.git
 ```
 
 # Usage
