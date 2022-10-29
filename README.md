@@ -13,10 +13,6 @@ pip install git+https://github.com/RobbyV2/abmusic.git
 ```python
 from discord.ext import commands
 
-bot = commands.Bot(command_prefix='.')
-
-from discord.ext import commands
-
 bot = commands.Bot(command_prefix='..')
 
 bot.lavalink_nodes = [
@@ -31,9 +27,6 @@ bot.spotify_credentials = {
 }
 
 bot.load_extension('abmusic')
-bot.run('TOKEN')
-
-bot.load_extension('dismusic')
 bot.run('TOKEN')
 ```
 
