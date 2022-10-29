@@ -47,7 +47,7 @@ class DisPlayer(Player):
 
     async def set_loop(self, loop_type: str) -> None:
         if not self.is_playing():
-            raise NothingIsPlaying("Player is not playing any track. Can't loop")
+            raise NothingIsPlaying("❌ Bot is not playing any track. Can't loop")
 
         if not loop_type:
             if Loop.TYPES.index(self.loop) >= 2:
@@ -74,28 +74,17 @@ class DisPlayer(Player):
         track = self.source
 
         if not track:
-            raise NothingIsPlaying("Player is not playing anything.")
+            raise NothingIsPlaying("❌ Bot is not playing anything.")
 
-        embed = discord.Embed(
-            title=track.title, url=track.uri, color=discord.Color(0x2F3136)
-        )
-        embed.set_author(
-            name=track.author,
-            url=track.uri,
-            icon_url=self.client.user.display_avatar.url,
-        )
-        try:
-            embed.set_thumbnail(url=track.thumb)
-        except AttributeError:
-            embed.set_thumbnail(
-                url="https://cdn.discordapp.com/attachments/776345413132877854/940540758442795028/unknown.png"
-            )
-        embed.add_field(
-            name="Length",
-            value=f"{int(track.length // 60)}:{int(track.length % 60)}",
-        )
-        embed.add_field(name="Looping", value=self.loop)
-        embed.add_field(name="Volume", value=self.volume)
+        y=""
+
+
+
+        y=y+f"""[ {track.title} By {track.author}]
+        {track.uri}
+        Length: {int(track.length // 60)}:{int(track.length % 60)}  Volume: {self.volume}  Looping Status: {self.looping}\n"""
+
+
 
         next_song = ""
 
@@ -106,9 +95,10 @@ class DisPlayer(Player):
                 next_song = self.queue._queue[0].title
 
         if next_song:
-            embed.add_field(name="Next Song", value=next_song, inline=False)
+            print(next_song)
+            y=y+f"[ Next Song - {next_song}]\n"
 
         if not ctx:
-            return await self.bound_channel.send(embed=embed)
+            return await self.bound_channel.send(y)
 
-        await ctx.send(embed=embed)
+        await ctx.send(y)

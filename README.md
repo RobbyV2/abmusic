@@ -20,11 +20,6 @@ bot.lavalink_nodes = [
     # Can have multiple nodes here
 ]
 
-# If you want to use spotify search
-bot.spotify_credentials = {
-    'client_id': 'CLIENT_ID_HERE',
-    'client_secret': 'CLIENT_SECRET_HERE'
-}
 
 bot.load_extension('dismusic')
 bot.run('TOKEN')
@@ -32,14 +27,13 @@ bot.run('TOKEN')
 
 # Commands
 
-**connect** - `Connect to vc` \
-**disconnect** - `Disconnect from vc`
+**join** - `Connect to vc` \
+**stop** - `Disconnect from vc`
 
 **play** - `Play a song or playlist` \
 **pause** - `Pause player` \
 **resume** - `Resume player`
 
-**seek** - `Seek player` \
 **nowplaying** - `Now playing` \
 **queue** - `See queue` \
 **volume** - `Set volume` \

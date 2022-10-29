@@ -6,7 +6,7 @@ from .errors import MustBeSameChannel, NotConnectedToVoice, PlayerNotConnected
 def voice_connected():
     def predicate(ctx: commands.Context):
         if not ctx.author.voice:
-            raise NotConnectedToVoice("You are not connected to any voice channel.")
+            raise NotConnectedToVoice("❌ You have to be in a voice channel to do this")
 
         return True
 
@@ -16,14 +16,14 @@ def voice_connected():
 def voice_channel_player():
     def predicate(ctx: commands.Context):
         if not ctx.author.voice:
-            raise NotConnectedToVoice("You are not connected to any voice channel.")
+            raise NotConnectedToVoice("❌ You have to be in a voice channel to do this")
 
         if not ctx.voice_client:
-            raise PlayerNotConnected("Player is not connected to any voice channel.")
+            raise PlayerNotConnected("❌ I am not connected to any voice channel.")
 
         if ctx.voice_client.channel.id != ctx.author.voice.channel.id:
             raise MustBeSameChannel(
-                "You must be in the same voice channel as the player."
+                "❌ You must be in the same voice channel as the bot."
             )
 
         return True

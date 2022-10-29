@@ -31,7 +31,7 @@ class Music(commands.Cog):
 
         if ctx.author.voice.channel.id != player.channel.id:
             raise MustBeSameChannel(
-                "You must be in the same voice channel as the player."
+                "❌ You must be in the same voice channel as the bot."
             )
 
         track_providers = {
@@ -43,7 +43,7 @@ class Music(commands.Cog):
         }
 
         query = query.strip("<>")
-        msg = await ctx.send(f"Searching for `{query}` :mag_right:")
+        msg = await ctx.send(f":mag_right: Searching for `{query}`")
 
         track_provider = provider if provider else player.track_provider
 
@@ -72,18 +72,18 @@ class Music(commands.Cog):
                 continue
 
         if not tracks:
-            return await msg.edit("No song/track found with given query.")
+            return await msg.edit("❌ No song/track found with given query.")
 
         if isinstance(tracks, YouTubePlaylist):
             tracks = tracks.tracks
             for track in tracks:
                 await player.queue.put(track)
 
-            await msg.edit(content=f"Added `{len(tracks)}` songs to queue. ")
+            await msg.edit(content=f"✅ Added `{len(tracks)}` song(s) to queue. ")
         else:
             track = tracks[0]
 
-            await msg.edit(content=f"Added `{track.title}` to queue. ")
+            await msg.edit(content=f"✅ Added `{track.title}` to queue. ")
             await player.queue.put(track)
 
         if not player.is_playing():
@@ -91,9 +91,6 @@ class Music(commands.Cog):
 
     async def start_nodes(self):
         await self.bot.wait_until_ready()
-        spotify_credential = getattr(
-            self.bot, "spotify_credentials", {"client_id": "", "client_secret": ""}
-        )
 
         for config in self.bot.lavalink_nodes:
             try:
@@ -102,26 +99,26 @@ class Music(commands.Cog):
                     **config,
                     spotify_client=spotify.SpotifyClient(**spotify_credential),
                 )
-                print(f"[dismusic] INFO - Created node: {node.identifier}")
+                print(f"[abmusic] Info - Created music node: {node.identifier}")
             except Exception:
                 print(
-                    f"[dismusic] ERROR - Failed to create node {config['host']}:{config['port']}"
+                    f"[abmusic] Error - Failed to create node {config['host']}:{config['port']}"
                 )
 
-    @commands.command(aliases=["con"])
+    @commands.command(aliases=["j", "connect"])
     @voice_connected()
-    async def connect(self, ctx: commands.Context):
+    async def join(self, ctx: commands.Context):
         """Connect the player"""
         if ctx.voice_client:
             return
 
-        msg = await ctx.send(f"Connecting to **`{ctx.author.voice.channel}`**")
+        msg = await ctx.send(f"✅ Connecting to **`{ctx.author.voice.channel}`**")
 
         try:
             player: DisPlayer = await ctx.author.voice.channel.connect(cls=DisPlayer)
             self.bot.dispatch("dismusic_player_connect", player)
         except (asyncio.TimeoutError, ClientException):
-            return await msg.edit(content="Failed to connect to voice channel.")
+            return await msg.edit(content="❌ Failed to connect to voice channel.")
 
         player.bound_channel = ctx.channel
         player.bot = self.bot
@@ -135,60 +132,32 @@ class Music(commands.Cog):
         await ctx.invoke(self.connect)
         await self.play_track(ctx, query)
 
-    @play.command(aliases=["yt"])
-    @voice_connected()
-    async def youtube(self, ctx: commands.Context, *, query: str):
-        """Play a YouTube track"""
-        await ctx.invoke(self.connect)
-        await self.play_track(ctx, query, "yt")
-
-    @play.command(aliases=["ytmusic"])
-    @voice_connected()
-    async def youtubemusic(self, ctx: commands.Context, *, query: str):
-        """Play a YouTubeMusic track"""
-        await ctx.invoke(self.connect)
-        await self.play_track(ctx, query, "ytmusic")
-
-    @play.command(aliases=["sc"])
-    @voice_connected()
-    async def soundcloud(self, ctx: commands.Context, *, query: str):
-        """Play a SoundCloud track"""
-        await ctx.invoke(self.connect)
-        await self.play_track(ctx, query, "soundcloud")
-
-    @play.command(aliases=["sp"])
-    @voice_connected()
-    async def spotify(self, ctx: commands.Context, *, query: str):
-        """play a spotify track"""
-        await ctx.invoke(self.connect)
-        await self.play_track(ctx, query, "spotify")
-
-    @commands.command(aliases=["vol"])
+    @commands.command(aliases=["v"])
     @voice_channel_player()
-    async def volume(self, ctx: commands.Context, vol: int, forced=False):
+    async def volume(self, ctx: commands.Context, vol: int):
         """Set volume"""
         player: DisPlayer = ctx.voice_client
 
         if vol < 0:
-            return await ctx.send("Volume can't be less than 0")
+            return await ctx.send("❌Volume can't be less than 0")
 
-        if vol > 100 and not forced:
-            return await ctx.send("Volume can't greater than 100")
+        if vol > 100:
+            return await ctx.send("❌ Volume can't greater than 100")
 
         await player.set_volume(vol)
-        await ctx.send(f"Volume set to {vol} :loud_sound:")
+        await ctx.send(f":loud_sound: Volume set to {vol}")
 
-    @commands.command(aliases=["disconnect", "dc"])
+    @commands.command(aliases=["disconnect", "dc", "leave", "st"])
     @voice_channel_player()
     async def stop(self, ctx: commands.Context):
         """Stop the player"""
         player: DisPlayer = ctx.voice_client
 
         await player.destroy()
-        await ctx.send("Stopped the player :stop_button: ")
+        await ctx.send(":stop_button: Stopped the bot")
         self.bot.dispatch("dismusic_player_stop", player)
 
-    @commands.command()
+    @commands.command(aliases=["pa"])
     @voice_channel_player()
     async def pause(self, ctx: commands.Context):
         """Pause the player"""
@@ -196,13 +165,13 @@ class Music(commands.Cog):
 
         if player.is_playing():
             if player.is_paused():
-                return await ctx.send("Player is already paused.")
+                return await ctx.send("❌ Bot is already paused.")
 
             await player.set_pause(pause=True)
             self.bot.dispatch("dismusic_player_pause", player)
-            return await ctx.send("Paused :pause_button: ")
+            return await ctx.send(":pause_button: Paused")
 
-        await ctx.send("Player is not playing anything.")
+        await ctx.send("❌ Bot is not playing anything.")
 
     @commands.command()
     @voice_channel_player()
@@ -212,15 +181,15 @@ class Music(commands.Cog):
 
         if player.is_playing():
             if not player.is_paused():
-                return await ctx.send("Player is already playing.")
+                return await ctx.send("❌ Player is already playing.")
 
             await player.set_pause(pause=False)
             self.bot.dispatch("dismusic_player_resume", player)
-            return await ctx.send("Resumed :musical_note: ")
+            return await ctx.send(":musical_note: Resumed")
 
-        await ctx.send("Player is not playing anything.")
+        await ctx.send("❌ Player is not playing anything.")
 
-    @commands.command()
+    @commands.command(aliases=["s"])
     @voice_channel_player()
     async def skip(self, ctx: commands.Context):
         """Skip to next song in the queue."""
@@ -232,30 +201,9 @@ class Music(commands.Cog):
         await player.stop()
 
         self.bot.dispatch("dismusic_track_skip", player)
-        await ctx.send("Skipped :track_next:")
+        await ctx.send(":track_next: Skipped")
 
-    @commands.command()
-    @voice_channel_player()
-    async def seek(self, ctx: commands.Context, seconds: int):
-        """Seek the player backward or forward"""
-        player: DisPlayer = ctx.voice_client
-
-        if player.is_playing():
-            old_position = player.position
-            position = old_position + seconds
-            if position > player.source.length:
-                return await ctx.send("Can't seek past the end of the track.")
-
-            if position < 0:
-                position = 0
-
-            await player.seek(position * 1000)
-            self.bot.dispatch("dismusic_player_seek", player, old_position, position)
-            return await ctx.send(f"Seeked {seconds} seconds :fast_forward: ")
-
-        await ctx.send("Player is not playing anything.")
-
-    @commands.command()
+    @commands.command(alises=["l"])
     @voice_channel_player()
     async def loop(self, ctx: commands.Context, loop_type: str = None):
         """Set loop to `NONE`, `CURRENT` or `PLAYLIST`"""
@@ -271,7 +219,7 @@ class Music(commands.Cog):
         player: DisPlayer = ctx.voice_client
 
         if len(player.queue._queue) < 1:
-            return await ctx.send("Nothing is in the queue.")
+            return await ctx.send("❌ Nothing is in the queue.")
 
         paginator = Paginator(ctx, player)
         await paginator.start()

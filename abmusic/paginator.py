@@ -25,11 +25,7 @@ class Paginator:
         return length
 
     def create_embed(self, tracks, current_page, total_pages):
-        embed = Embed(color=Color(0x2F3136))
-        embed.set_author(
-            name="Queue",
-            icon_url="https://cdn.discordapp.com/attachments/776345413132877854/940247400046542948/list.png",
-        )
+        y="[ Queue ]\n"
 
         if self.player.loop == Loop.CURRENT:
             next_song = (
@@ -46,18 +42,17 @@ class Paginator:
                 f"{current_page * 10 + index + 1}. [{track.title}]({track.uri}) \n"
             )
 
-        embed.description = description
+        y = y+f"{description}"
 
         if total_pages == 1:
-            embed.set_footer(
-                text=f"{len(self.player.queue._queue)} tracks, {queue_length}"
-            )
-        else:
-            embed.set_footer(
-                text=f"Page {current_page + 1}/{total_pages}, {len(self.player.queue._queue)} tracks, {queue_length}"
-            )
 
-        return embed
+            y=y+f"{len(self.player.queue._queue)} tracks, {queue_length}\n"
+        
+        else:
+            y=y+f"Page {current_page + 1}/{total_pages}, {len(self.player.queue._queue)} tracks, {queue_length}\n"
+            
+
+        return y
 
     async def start(self):
         per_page = 10
@@ -70,12 +65,12 @@ class Paginator:
 
         while True:
             tracks = track_list[current_page * per_page : (current_page + 1) * per_page]
-            embed = self.create_embed(tracks, current_page, total_pages)
+            mes = self.create_embed(tracks, current_page, total_pages)
 
             if not msg:
-                msg = await self.ctx.send(embed=embed)
+                msg = await self.ctx.send(mes)
             else:
-                await msg.edit(embed=embed)
+                await msg.edit(mes)
 
             if total_pages > 1:
                 try:
