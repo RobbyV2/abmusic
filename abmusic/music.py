@@ -91,7 +91,9 @@ class Music(commands.Cog):
 
     async def start_nodes(self):
         await self.bot.wait_until_ready()
-
+        spotify_credential = getattr(
+            self.bot, "spotify_credentials", {"client_id": "", "client_secret": ""}
+        )
         for config in self.bot.lavalink_nodes:
             try:
                 node: wavelink.Node = await wavelink.NodePool.create_node(
