@@ -31,7 +31,7 @@ class Music(commands.Cog):
 
         if ctx.author.voice.channel.id != player.channel.id:
             raise MustBeSameChannel(
-                "❌ You must be in the same voice channel as the bot."
+                "❌ You must be in the same voice channel as the bot!"
             )
 
         track_providers = {
@@ -79,7 +79,7 @@ class Music(commands.Cog):
             for track in tracks:
                 await player.queue.put(track)
 
-            await msg.edit(content=f"✅ Added `{len(tracks)}` song(s) to queue. ")
+            await msg.edit(content=f"✅ Added `{len(tracks)}` songs to queue. ")
         else:
             track = tracks[0]
 
@@ -94,6 +94,7 @@ class Music(commands.Cog):
         spotify_credential = getattr(
             self.bot, "spotify_credentials", {"client_id": "", "client_secret": ""}
         )
+
         for config in self.bot.lavalink_nodes:
             try:
                 node: wavelink.Node = await wavelink.NodePool.create_node(
@@ -101,11 +102,12 @@ class Music(commands.Cog):
                     **config,
                     spotify_client=spotify.SpotifyClient(**spotify_credential),
                 )
-                print(f"[abmusic] Info - Created music node: {node.identifier}")
+                print(f"[dismusic] INFO - Created node: {node.identifier}")
             except Exception:
                 print(
-                    f"[abmusic] Error - Failed to create node {config['host']}:{config['port']}"
+                    f"[dismusic] ERROR - Failed to create node {config['host']}:{config['port']}"
                 )
+
 
     @commands.command(aliases=["j", "connect"])
     @voice_connected()
